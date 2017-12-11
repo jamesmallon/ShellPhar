@@ -1,0 +1,372 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Created by Thiago Mallon <thiagomallon@gmail.com>
+ */
+
+/**
+ * Class MallonShell
+ * @author Thiago Mallon <thiagomallon@gmail.com>
+ */
+class MallonShell
+{
+    
+    /**
+     * Property stores possible foreground colors
+     * @var array $fgColor Opções de cores de texto
+     */
+    protected $fgColor = [
+        'black' => '0;30',
+        'darkgray' => '1;30',
+        'blue' => '0;34',
+        'lightblue' => '1;34',
+        'green' => '0;32',
+        'lightgreen' => '1;32',
+        'cyan' => '0;36',
+        'lightcyan' => '1;36',
+        'red' => '0;31',
+        'lightred' => '1;31',
+        'purple' => '0;35',
+        'lightpurple' => '1;35',
+        'brown' => '0;33',
+        'yellow' => '1;33',
+        'lightgray' => '0;37',
+        'white' => '1;37',
+    ];
+    
+    /**
+     * Property stores possible background colors
+     * @var array $bgColor Opções de cores de fundo
+     */
+    protected $bgColor = [
+        'black' => '40',
+        'red' => '41',
+        'green' => '42',
+        'yellow' => '43',
+        'blue' => '44',
+        'magenta' => '45',
+        'cyan' => '46',
+        'lightgray' => '47',
+    ];
+    
+    /**
+     * Property stores message to be decorated
+     * @var string $decoratedTxt Texto 'decorado'
+     */
+    protected $decoratedTxt;
+
+    /**
+     * Input arguments
+     * @var array $_args Armazena argumentos recebidos via shell
+     */
+    protected $_args = array();
+
+    /**
+     * Initialize application and parse input parameters
+     */
+    public function __construct()
+    {
+        $this->_parseArgs();
+    }
+
+    /**
+     * The go method
+     * @return null
+     */
+    public function go()
+    {
+        if ($this->getArg('rbt')) {
+            $this->reboot();
+            return;
+        }
+        
+        if ($this->getArg('shtd')) {
+            $this->shutdown();
+            return;
+        }
+        
+        if ($this->getArg('lk')) {
+            $this->lock();
+            return;
+        }
+        
+        /* Binary */
+        if ($this->getArg('d2b')) {
+            $this->decimalToBinary();
+            return;
+        }
+        if ($this->getArg('b2d')) {
+            $this->binaryToDecimal();
+            return;
+        }
+
+        /* Hexadecimal */
+        if ($this->getArg('d2x')) {
+            $this->decimalToHexadecimal();
+            return;
+        }
+        if ($this->getArg('x2d')) {
+            $this->hexadecimalToDecimal();
+            return;
+        }
+
+        /* Octal */
+        if ($this->getArg('d2o')) {
+            $this->decimalToOctal();
+            return;
+        }
+        if ($this->getArg('o2d')) {
+            $this->octalToDecimal();
+            return;
+        }
+        
+        echo $this->usageHelp();
+    }
+
+    /**
+     * The decimalToBinary method
+     * 
+     * @return  
+     */
+    public function decimalToBinary()
+    {        
+        $num = array_keys($this->_args)[1];        
+        
+                print <<<TEST1
+
+{$this->decorate('The conversion\'s result is: ', 'lightgreen')}
+
+
+TEST1;
+        echo '0b'.shell_exec("echo 'obase=2;$num' | bc")."\n";
+    }   
+
+    /**
+     * The decimalToBinary method
+     * 
+     * @return  
+     */
+    public function binaryToDecimal()
+    {        
+        $num = preg_replace('/0b/', '', array_keys($this->_args)[1]);
+        
+                print <<<TEST1
+
+{$this->decorate('The conversion\'s result is: ', 'lightgreen')}
+
+
+TEST1;
+        echo shell_exec("echo 'ibase=2; $num' | bc")."\n";
+    }    
+
+    /**
+     * The hexadecimalToDecimal method
+     * 
+     * @return  
+     */
+    public function decimalToHexadecimal()
+    {        
+        $num = array_keys($this->_args)[1];        
+        
+                print <<<TEST1
+
+{$this->decorate('The conversion\'s result is: ', 'lightgreen')}
+
+
+TEST1;
+        echo '0x'.shell_exec("echo 'obase=16; $num' | bc")."\n";
+    }
+
+    /**
+     * The hexadecimalToDecimal method
+     * 
+     * @return  
+     */
+    public function hexadecimalToDecimal()
+    {        
+        $num = preg_replace('/0x/', '', array_keys($this->_args)[1]);
+        
+                print <<<TEST1
+
+{$this->decorate('The conversion\'s result is: ', 'lightgreen')}
+
+
+TEST1;
+        echo shell_exec("echo 'ibase=16; $num' | bc")."\n";
+    }
+
+    /**
+     * The decimalToOctal method
+     * 
+     * @return  
+     */
+    public function decimalToOctal()
+    {        
+        $num = array_keys($this->_args)[1];        
+        
+                print <<<TEST1
+
+{$this->decorate('The conversion\'s result is: ', 'lightgreen')}
+
+
+TEST1;
+        echo shell_exec("echo 'obase=8; $num' | bc")."\n";
+    }
+
+    /**
+     * The octalToDecimal method
+     * 
+     * @return  
+     */
+    public function octalToDecimal()
+    {        
+        $num = array_keys($this->_args)[1];        
+        
+                print <<<TEST1
+
+{$this->decorate('The conversion\'s result is: ', 'lightgreen')}
+
+
+TEST1;
+        echo shell_exec("echo 'ibase=8; $num' | bc")."\n";
+    }
+
+    /**
+     * Method reboot.
+     * @return null
+     */
+    public function reboot()
+    {
+        print <<<TEST1
+
+{$this->decorate('You choose to reboot your pc.', 'lightgreen')}
+
+
+TEST1;
+
+        shell_exec('sudo reboot');
+    }
+
+    /**
+     * Method shutdown.
+     * @return null
+     */
+    public function shutdown()
+    {
+        print <<<TEST2
+
+{$this->decorate('You choose to shutdown the machine', 'lightgreen')}
+
+TEST2;
+    
+        shell_exec('sudo shutdown -h now');
+    }
+
+    /**
+     * Method lock.
+     * @return null
+     */
+    public function lock()
+    {
+        print <<<TEST3
+
+{$this->decorate('Locking PC...', 'lightgreen')}
+
+
+TEST3;
+        shell_exec('gnome-screensaver-command -l');
+    }
+
+    /**
+     * Method usageHelp.
+     * @return null
+     */
+    public function usageHelp()
+    {
+        return <<<USAGE
+
+{$this->decorate('Usage', 'lightgray')}:  {$this->decorate('php MallonShell.php -- [', 'lightgray')}{$this->decorate('option', 'green')}{$this->decorate(']', 'lightgray')}
+
+    {$this->decorate('--silent', 'red')}    : {$this->decorate('disable output command', 'green')}
+    {$this->decorate('--force', 'red')}     : {$this->decorate('force command', 'green')}
+    {$this->decorate('rbt', 'yellow')}         : {$this->decorate('Reboot PC.', 'green')}
+    {$this->decorate('shtd', 'yellow')}        : {$this->decorate('Shutdown PC', 'green')}
+    {$this->decorate('lk', 'yellow')}          : {$this->decorate('Lock PC', 'green')}
+
+    {$this->decorate('Decimal conversions', 'cyan')}
+    
+    {$this->decorate('d2b', 'yellow')}         : {$this->decorate('Decimal to Binary - conversion', 'green')}
+    {$this->decorate('b2d', 'yellow')}         : {$this->decorate('Binary to Decimal - conversion', 'green')}
+    {$this->decorate('d2x', 'yellow')}         : {$this->decorate('Decimal to Hexadecimal - conversion', 'green')}
+    {$this->decorate('x2d', 'yellow')}         : {$this->decorate('Hexadecimal to Decimal - conversion', 'green')}
+    {$this->decorate('d2o', 'yellow')}         : {$this->decorate('Decimal to Octal - conversion', 'green')}
+    {$this->decorate('o2d', 'yellow')}         : {$this->decorate('Octal to Decimal - conversion', 'green')}
+
+
+USAGE;
+    }
+
+    /**
+     * Parse input arguments
+     * @return null
+     */
+    protected function _parseArgs()
+    {
+        $current = null;
+        foreach ($_SERVER['argv'] as $arg) {
+            $match = array();
+            if (preg_match('#^--([\w\d_-]{1,})$#', $arg, $match) || preg_match('#^-([\w\d_]{1,})$#', $arg, $match)) {
+                $current = $match[1];
+                $this->_args[$current] = true;
+            } else {
+                if ($current) {
+                    $this->_args[$current] = $arg;
+                } else if (preg_match('#^([\w\d_]{1,})$#', $arg, $match)) {
+                    $this->_args[$match[1]] = true;
+                }
+            }
+        }
+    }
+
+    /**
+     * Retrieve argument value by name or false
+     *
+     * @param string $name the argument name
+     * @return mixed
+     */
+    public function getArg($name)
+    {
+        if (isset($this->_args[$name])) {
+            return $this->_args[$name];
+        }
+        return false;
+    }
+
+    /**
+     * Method returns decorated text
+     * @param string $msg Text to be decorated
+     * @param string $fgrColor Foreground color
+     * @param string $bfrColor Background color
+     * @return string $decoratedTxt
+     */
+    protected function decorate($txt = null, $fgrColor = null, $bgrColor = null)
+    {
+        if (!empty($txt) && ($fgrColor || $bgrColor)) {
+            // check and try to apply fg. color
+            $this->decoratedTxt .= ((array_key_exists($fgrColor, $this->fgColor))?
+                "\033[".$this->fgColor[$fgrColor].'m': // if !null set
+                null); // set null
+    
+            // check and try to apply bg. color
+            $this->decoratedTxt .= ((array_key_exists($bgrColor, $this->bgColor))?
+                "\033[".$this->bgColor[$bgrColor].'m': // if !null set
+                null); // set null
+            return $this->decoratedTxt . "$txt\033[0m";
+        }
+        return $txt;
+    }
+}
+
+$testVall = new MallonShell();
+$testVall->go();
